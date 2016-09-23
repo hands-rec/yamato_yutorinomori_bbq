@@ -64,9 +64,15 @@ module YamatoYutorinomoriBbq
 
   class BookableDateTime
     def initialize(date, time_id, value)
-      @date = date
+      @date = parse_date(date)
       @time_id = time_id
       @value = value
+    end
+
+    def parse_date(date)
+      month_day = date.slice(0, date.index("("))
+      year = Date.today.year.to_s
+      Date.parse("#{year}/#{month_day}")
     end
 
     def available?
@@ -74,7 +80,8 @@ module YamatoYutorinomoriBbq
     end
 
     def to_s
-      "#{@date} #{time} #{@value}"
+      d = @date.strftime("%m-%d(%A)")
+      "#{d} #{time} #{@value}"
     end
 
     def time

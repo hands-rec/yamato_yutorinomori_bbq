@@ -72,7 +72,7 @@ describe YamatoYutorinomoriBbq::Scraper do
     end
 
     it 'first' do
-      expect(@scraper.find_bookable_list.first.to_s).to eq "09/23(金) 10時 ～ ◎"
+      expect(@scraper.find_bookable_list.first.to_s).to eq "09-23(Friday) 10時 ～ ◎"
     end
   end
 end
