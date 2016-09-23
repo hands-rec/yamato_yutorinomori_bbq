@@ -74,7 +74,7 @@ module YamatoYutorinomoriBbq
     end
 
     def to_s
-      "#{@date} #{@time} #{@value}"
+      "#{@date} #{time} #{@value}"
     end
 
     def time

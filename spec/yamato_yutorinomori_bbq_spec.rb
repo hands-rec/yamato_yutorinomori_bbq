@@ -70,5 +70,9 @@ describe YamatoYutorinomoriBbq::Scraper do
     it 'list count 41' do
       expect(@scraper.find_bookable_list.length).to eq 41 
     end
+
+    it 'first' do
+      expect(@scraper.find_bookable_list.first.to_s).to eq "09/23(金) 10時 ～ ◎"
+    end
   end
 end
