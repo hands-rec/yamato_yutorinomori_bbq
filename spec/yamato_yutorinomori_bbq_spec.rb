@@ -74,5 +74,20 @@ describe YamatoYutorinomoriBbq::Scraper do
     it 'first' do
       expect(@scraper.find_bookable_list.first.to_s).to eq "09-23(Friday) 10時 ～ ◎"
     end
+
+    it 'holiday' do
+      within = [YamatoYutorinomoriBbq::Within::Holiday]
+      holidays = @scraper.find_bookable_list(within:within)
+      expect(holidays.length).to eq 2
+    end
+
+    it 'holiday and sunday' do
+      within = [
+        YamatoYutorinomoriBbq::Within::Holiday,
+        YamatoYutorinomoriBbq::Within::Sunday,
+      ]
+      holidays = @scraper.find_bookable_list(within:within)
+      expect(holidays.length).to eq 2
+    end
   end
 end

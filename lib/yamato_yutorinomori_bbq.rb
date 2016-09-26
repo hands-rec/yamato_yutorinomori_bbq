@@ -4,6 +4,7 @@ require 'nokogiri'
 require 'date'
 require 'open-uri'
 require 'openssl'
+require 'holiday_jp'
 
 module YamatoYutorinomoriBbq
 
@@ -13,10 +14,10 @@ module YamatoYutorinomoriBbq
       @site_url = "https://175.184.45.152:24135/yamato/rv/index.php"
     end
 
-    def find_bookable_list
+    def find_bookable_list(within: [])
       source = open(@site_url, 'User-Agent' => CRAWLER_UA, :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE)
       scraper = YamatoYutorinomoriBbq::Scraper.new(source)
-      scraper.find_bookable_list
+      scraper.find_bookable_list(within: within)
     end
   end
 
@@ -41,13 +42,23 @@ module YamatoYutorinomoriBbq
       @date_time_list
     end
 
-    def find_bookable_list
+    def find_bookable_list(within: [])
       execute if @date_time_list.length == 0
       list = []
       @date_time_list.each do |datetime|
         list << datetime if datetime.available?
       end
-      list
+      within.empty? ? list : within(list, within)
+    end
+
+    def within(list, within) 
+      list.select do |datetime|
+        result = false
+        within.each do |w|
+          result = result || w.within?(datetime.date)
+        end
+        result
+      end
     end
 
     def scrape_date(tr)
@@ -59,10 +70,31 @@ module YamatoYutorinomoriBbq
       second_half = tr.css('td:nth-child(9)').text.strip
       {1 => first_half, 2 => second_half}
     end
+  end
 
+  module Within
+    module Holiday
+      def within?(date)
+        HolidayJp.holiday?(date)
+      end
+      module_function :within?
+    end
+    module Sunday
+      def within?(date)
+        date.sunday?
+      end
+      module_function :within?
+    end
+    module Saturday
+      def within?(date)
+        date.saturday?
+      end
+      module_function :within?
+    end
   end
 
   class BookableDateTime
+    attr_reader :date
     def initialize(date, time_id, value)
       @date = parse_date(date)
       @time_id = time_id
